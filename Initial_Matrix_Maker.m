@@ -1,3 +1,4 @@
+
 NN=8; %number of nodes                                                                                                                                                                                                 ; %number of nodes including string
 %columns in elemental matrix
 N1=1;N2=2;C=3;S=4;e=5;CrossA=6;L=7; ro=8;thick=9; I=10;
@@ -66,6 +67,8 @@ for i=1:NN
     %youngs modulus and thickness
     element(i,L)=sqrt((Nodes(element(i,N2),1)-Nodes(element(i,N1),1))^2 + ...
         (Nodes(element(i,N2),2)-Nodes(element(i,N1),2))^2);
+    
+    %calculates C and S. Can be used to update angles
     element(i,C)= (Nodes(element(i,N2),1)-Nodes(element(i,N1),1))/element(i,L);%(x2-x1)/L
     element(i,S)= (Nodes(element(i,N2),2)-Nodes(element(i,N1),2))/element(i,L);%(y2-y1)/L
     
@@ -92,7 +95,8 @@ for i=1:NN
 end
 
 %plots the bow
-figure('color','white');
+f=figure(1);
+set(f,'color','white');
 bow=zeros(NN,1);
 axis equal, axis off
 ylim([-1 1]);
@@ -102,7 +106,7 @@ xlim([-1 1]);
 for i=1:NN
     lx=[Nodes(element(i,N1),1) Nodes(element(i,N2),1)];
     ly=[Nodes(element(i,N1),2) Nodes(element(i,N2),2)];
-    bow(i,1)=line(lx,ly,'color','blue','LineWidth',element(i,thick)*100);
+    line(lx,ly,'color','blue','LineWidth',element(i,thick)*100);
 end
 
 
