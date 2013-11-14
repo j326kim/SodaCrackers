@@ -1,3 +1,6 @@
+function [ G_M, G_K, G_C, KeffMatrices ] = CoefMaker( NN, element)
+
+
 %Create global stiffness, damping, mass matrices with dimension:
 G_K = zeros(3*NN);
 G_C = zeros(3*NN);
@@ -27,4 +30,7 @@ end
     
 
 
+
+
+end
 

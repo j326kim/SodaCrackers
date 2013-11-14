@@ -43,13 +43,15 @@ Uminus=zeros(NN*3,1);
 Uplus=zeros(NN*3,1);
 x_Animate = zeros(NN, 2000);
 y_Animate = zeros(NN, 2000);
+KeffMatrices = zeros(6, 6, NN);
 
 %really what you wanna look at is G_K G_M G_C
-CoefMaker;
 
-sparseNodes=[3*NN/2-2 3*NN/2-1 3*NN/2 3*NN-1 3*NN];
+
+sparseNodes=[3*NN 3*NN-1 3*NN/2 3*NN/2-1 3*NN/2-2];
 
 %sparce
+[ G_M, G_K, G_C, KeffMatrices ] = CoefMaker( NN, element);
 [G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,sparseNodes,RunningFlag);
 RunningFlag=1;
 
@@ -58,6 +60,8 @@ RunningFlag=1;
 while (failureFlag == 0)
     
 F(end - 2) = F(end - 2) + F_Step;
+
+
 
 
 %Setup to make everything in the form Ax = B
@@ -87,21 +91,26 @@ F(end - 2) = F(end - 2) + F_Step;
         if i == NN/2
             flag_center = 1;
         end
-        if i == NN - 1
-            Nodes(i+1,1) = Nodes(i+1,1) + U(3*i-2,1)-Uminus(3*i-2,1);
-            x_Animate(i+1, count+1) =  Nodes(i+1,1);
-        end
+
         if flag_center == 0 
             Nodes(i,1) = Nodes(i,1) + U(3*i-2,1)-Uminus(3*i-2,1);
             x_Animate(i, count+1) =  Nodes(i,1);
             Nodes(i,2) = Nodes(i,2) + U(3*i-1,1)-Uminus(3*i-1,1);
-            y_Animate(i, count+1) =  yfinal(1,i);
+            y_Animate(i, count+1) =  Nodes(i,2);
         else
             Nodes(i+1,1) = Nodes(i+1,1) + U(3*i-2,1)-Uminus(3*i-2,1);
             x_Animate(i+1, count+1) =  Nodes(i+1,1);
-            Nodes(i+1,2) = Nodes(i+1,2) + U(3*i-1,1)-Uminus(3*i-1,1);
+            Nodes(i+1,2) = Nodes(i+1,2) + U(3*i-2,1)-Uminus(3*i-2,1);
             y_Animate(i+1, count+1) =  Nodes(i+1,2);
         end
+        
+        if i == NN - 1
+            Nodes(i+1,1) = Nodes(i+1,1) + U(3*i-2,1)-Uminus(3*i-2,1);
+            x_Animate(i+1, count+1) =  Nodes(i+1,1);
+            Nodes(i+1,2) = 0;
+            y_Animate(i+1, count+1) =  0;
+        end
+        
     end
     
 %     %string(2) is the string node which moves in the X direction
@@ -118,10 +127,10 @@ F(end - 2) = F(end - 2) + F_Step;
 %     stringy(end)=yfinal(end);
 %     stringy(1)=yfinal(1);
 for i = 1:NN
-    element(i,L)=sqrt((Nodes(element(i,N2),1)-Nodes(element(i,N1),1))^2 + ...
+    element(i,7)=sqrt((Nodes(element(i,N2),1)-Nodes(element(i,N1),1))^2 + ...
         (Nodes(element(i,N2),2)-Nodes(element(i,N1),2))^2);
-    element(i,C)= (Nodes(element(i,N2),1)-Nodes(element(i,N1),1))/element(i,L);%(x2-x1)/L
-    element(i,S)= (Nodes(element(i,N2),2)-Nodes(element(i,N1),2))/element(i,L);%(y2-y1)/L
+    element(i,3)= (Nodes(element(i,N2),1)-Nodes(element(i,N1),1))/element(i,L);%(x2-x1)/L
+    element(i,4)= (Nodes(element(i,N2),2)-Nodes(element(i,N1),2))/element(i,L);%(y2-y1)/L
 end 
     %show the current shape of the bow in an animation
     Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end - 2))
@@ -148,7 +157,7 @@ end
 %                          (yfinal(1,i)-yfinal(1,i-1))^2);
 %     end
 
-    CoefMaker;
+    [ G_M, G_K, G_C, KeffMatrices ] = CoefMaker( NN, element);
     [G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,sparseNodes,RunningFlag);
 
 %     [G_K,G_C,G_M] = Sparse2(G_K,G_C,G_M,indexcenternode);
@@ -158,7 +167,7 @@ end
 %     if mod(count,300)==0
 %         pause;
 %     end
-   
+   pause(0.04)
 end
 
 % 
