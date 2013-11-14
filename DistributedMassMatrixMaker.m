@@ -1,9 +1,4 @@
-function [ G_M ] = DistributedMassMatrixMaker(G_M,angle,Node1,Node2,row,A,L)
-%UNTITLED4 Summary of this function goes here
-
-%   Detailed explanation goes here
-        C=floor(cos(angle)*10^10)/10^10;
-        S=floor(sin(angle)*10^10)/10^10;
+function [ G_M ] = DistributedMassMatrixMaker(G_M,C,S,Node1,Node2,row,A,L)
         
         T = [C S 0 0 0 0;
             -S C 0 0 0 0;
@@ -29,3 +24,8 @@ function [ G_M ] = DistributedMassMatrixMaker(G_M,angle,Node1,Node2,row,A,L)
         G_M(Node1:Node1+3-1,Node2:Node2+3-1)= G_M(Node1:Node1+3-1,Node2:Node2+3-1)+local(4:6,1:3);
 end
 
+%UNTITLED4 Summary of this function goes here
+
+%   Detailed explanation goes here
+%        C=floor(cos(angle)*10^10)/10^10;
+%        S=floor(sin(angle)*10^10)/10^10;

@@ -1,33 +1,28 @@
-% E = xlsread('InputFile', 1, 'B2');
-G_K = zeros(3*(length(xfinal)+1));
-G_C = zeros(3*(length(xfinal)+1));
-G_M = zeros(3*(length(xfinal)+1));
-KeffMatrices = zeros(6, 6,length(xfinal)); %KeffMatrises(:,:,i)
+%Create global stiffness, damping, mass matrices with dimension:
+%1 by (3*numberOfNodes)
+G_K = zeros(3*NN);
+G_C = zeros(3*NN);
+G_M = zeros(3*NN);
+KeffMatrices = zeros(6, 6, NN); %KeffMatrises(:,:,i)
 
-for i = 2:(length(xfinal))
-    N1 = i-1;
-    N2 = i;
-    L = elementVec(i);
-    A = w*thickness(i); 
-    Angle = angles(i);
-    I = w*thickness(i)^3/12; 
-        
-    [G_K, KeffMatrices(:,:,i)] = MatInsert(G_K,Angle,E,L,A,I,N1,N2);
-   % G_C = dampInsert(G_C,Angle,L,A,N1,N2);
-    G_M = DistributedMassMatrixMaker(G_M,Angle,N1,N2,p,A,L);
+for i=1:NN
     
-%     if (G_C~=G_C.')
-%         pause
-%     end
-%     if(G_K~=G_K.')
-%         pause
-%     end
-%     if(G_M~=G_M.')
-%         pause
-%     end
+    N1 = element(i,1);  %First Node
+    N2 = element(i,2);  %Second Node
+    C  = element(i,3);  %Cosine
+    S  = element(i,4);  %Sine
+    E  = element(i,5);  %Modulus of Elasticity
+    A  = element(i,6);  %Cross Sectional Area
+    L  = element(i,7);  %Length
+    P  = element(i,8);  %Density
+    Th = element(i,9);  %Thickness
+    I  = element(i,10); %Inertia
+    
+    [G_K, KeffMatrices(:,:,i)] = MatInsert(G_K,C,S,E,L,A,I,N1,N2);
+    G_M = DistributedMassMatrixMaker(G_M,C,S,N1,N2,P,A,L);
+    G_C = dampInsert(G_C,C,S,L,A,N1,N2);
 end
-
-
+    
 
 
 

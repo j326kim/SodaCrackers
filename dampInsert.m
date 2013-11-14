@@ -1,8 +1,4 @@
-function G_C = dampInsert(Global,angle,L,A,Node1,Node2)
-
-    %create local matrix
-    C=floor(cos(angle)*10^10)/10^10;
-    S=floor(sin(angle)*10^10)/10^10;
+function G_C = dampInsert(Global,C,S,L,A,Node1,Node2)
     
     Cd = 1.18125 * L * A;
     if Node1 == length(Global)/3 || Node2 == length(Global)/3
@@ -20,3 +16,7 @@ function G_C = dampInsert(Global,angle,L,A,Node1,Node2)
     
     G_C = Global;
 end
+
+    %create local matrix
+%    C=floor(cos(angle)*10^10)/10^10;
+%    S=floor(sin(angle)*10^10)/10^10;
