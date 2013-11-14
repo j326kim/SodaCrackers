@@ -2,54 +2,74 @@ clear all;
 close all;
 clc;
 
+%for in newtons
 F_Start = 0;
 F_Step = 0.1;
 F_End = 100;
+
+%time step
 dt = 0.00001;
+
+%number of times through loop
 count = 0;
+
+%flaiure flag will be set to 1 when failure condition reached
 failureFlag = 0;
 
+%running flag will be set to one after the first iteration to avoid
+%resparcing unnecessary sparcing
+RunningFlag=0;
+
+%wood properties
 E =6894757290; %youngs Modulus of wood
 p = 470; %Density (wood)
 w = 0.04445; %Width of wood (Constant)
+
+%string properties
 stringMass = 0.0164427; % Mass of the string 
 stringE = 2e11; %String modulus of elasticity
 stringD = 0.0015875; %String Diameter
+
+%failure parameters for bow
 maxtension = 1790000;
 maxcompression = 16500000;
 
-
+%really what you want to look at is Nodes and element
 Initial_Matrix_Maker;
 
-F = zeros(Number_of_nodes*3,1);
-U=zeros(Number_of_nodes*3,1);
-Uminus=zeros(Number_of_nodes*3,1);
-Uplus=zeros(Number_of_nodes*3,1);
-x_Animate = zeros(Number_of_nodes, 2000);
-y_Animate = zeros(Number_of_nodes, 2000);
+F = zeros(NN*3,1);
+U=zeros(NN*3,1);
+Uminus=zeros(NN*3,1);
+Uplus=zeros(NN*3,1);
+x_Animate = zeros(NN, 2000);
+y_Animate = zeros(NN, 2000);
 
+%really what you wanna look at is G_K G_M G_C
 CoefMaker;
 
-sparseNodes=[3*NN/2-2 3*NN/2-1 3*NN/2 3*NN-2 3*NN-1];
+sparseNodes=[3*NN/2-2 3*NN/2-1 3*NN/2 3*NN-1 3*NN];
 
 %sparce
-[G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,sparseNodes);
+[G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,sparseNodes,RunningFlag);
+RunningFlag=1;
 
 
-
-while ((failureFlag == 0 )&&( F(end-2) <= 2*F_End))
+% while ((failureFlag == 0 )&&( F(end-2) <= 2*F_End))
+while (failureFlag == 0)
     
-    F(end - 2) = F(end - 2) + F_Step;
-    %Setup to make everything in the form Ax = B
+F(end - 2) = F(end - 2) + F_Step;
+
+
+%Setup to make everything in the form Ax = B
         A = G_M/dt^2 + G_C/(2*dt); 
         G1 = (G_K - 2*G_M/(dt^2))*U;
         G2 = (G_M/dt^2 - G_C/(2*dt))*Uminus;
-
-        if (F(end-2) < F_End)
+% 
+%         if (F(end-2) < F_End)
            B =  -G1 - G2 + F;    %make force vector
-        else
-           B =  -G1 - G2;
-        end
+%         else
+%            B =  -G1 - G2;
+%         end
 
         %Solve for Uplus
 %       Uplus = seidelSolver(G_M,G_K,G_C,Uminus,U,dt,F);
@@ -63,37 +83,46 @@ while ((failureFlag == 0 )&&( F(end-2) <= 2*F_End))
         
 
     flag_center = 0;
-    for i = 1 : Number_of_nodes - 2
-        if i == indexcenternode
+    for i = 1 : NN - 1
+        if i == NN/2
             flag_center = 1;
         end
+        if i == NN - 1
+            Nodes(i+1,1) = Nodes(i+1,1) + U(3*i-2,1)-Uminus(3*i-2,1);
+            x_Animate(i+1, count+1) =  Nodes(i+1,1);
+        end
         if flag_center == 0 
-            xfinal(1,i) = xfinal(1,i) + U(3*i-2,1)-Uminus(3*i-2,1);
-            x_Animate(i, count+1) =  xfinal(1,i);
-            yfinal(1,i) = yfinal(1,i) + U(3*i-1,1)-Uminus(3*i-1,1);
+            Nodes(i,1) = Nodes(i,1) + U(3*i-2,1)-Uminus(3*i-2,1);
+            x_Animate(i, count+1) =  Nodes(i,1);
+            Nodes(i,2) = Nodes(i,2) + U(3*i-1,1)-Uminus(3*i-1,1);
             y_Animate(i, count+1) =  yfinal(1,i);
         else
-            xfinal(1,i+1) = xfinal(1,i+1) + U(3*i-2,1)-Uminus(3*i-2,1);
-            x_Animate(i+1, count+1) =  xfinal(1,i+1);
-            yfinal(1,i+1) = yfinal(1,i+1) + U(3*i-1,1)-Uminus(3*i-1,1);
-            y_Animate(i+1, count+1) =  yfinal(1,i+1);
+            Nodes(i+1,1) = Nodes(i+1,1) + U(3*i-2,1)-Uminus(3*i-2,1);
+            x_Animate(i+1, count+1) =  Nodes(i+1,1);
+            Nodes(i+1,2) = Nodes(i+1,2) + U(3*i-1,1)-Uminus(3*i-1,1);
+            y_Animate(i+1, count+1) =  Nodes(i+1,2);
         end
     end
     
-    %string(2) is the string node which moves in the X direction
-    stringx(2) = stringx(2) + U(end-2) - Uminus(end-2);
-    stringy(2)=0; %string node does not move in the Y direction so it is always zero
-    %add the string node to the animation matrix as the last node
-    x_Animate(end, count+1) =  stringx(2);
-    y_Animate(end, count+1) =  stringy(2);
-    
-    %update the endpoints of the string (unnecessary since they are the
-    %same as the end points on the bow)
-    stringx(1) = xfinal(1);
-    stringx(end)=xfinal(end);
-    stringy(end)=yfinal(end);
-    stringy(1)=yfinal(1);
-
+%     %string(2) is the string node which moves in the X direction
+%     stringx(2) = stringx(2) + U(end-2) - Uminus(end-2);
+%     stringy(2)=0; %string node does not move in the Y direction so it is always zero
+%     %add the string node to the animation matrix as the last node
+%     x_Animate(end, count+1) =  stringx(2);
+%     y_Animate(end, count+1) =  stringy(2);
+%     
+%     %update the endpoints of the string (unnecessary since they are the
+%     %same as the end points on the bow)
+%     stringx(1) = xfinal(1);
+%     stringx(end)=xfinal(end);
+%     stringy(end)=yfinal(end);
+%     stringy(1)=yfinal(1);
+for i = 1:NN
+    element(i,L)=sqrt((Nodes(element(i,N2),1)-Nodes(element(i,N1),1))^2 + ...
+        (Nodes(element(i,N2),2)-Nodes(element(i,N1),2))^2);
+    element(i,C)= (Nodes(element(i,N2),1)-Nodes(element(i,N1),1))/element(i,L);%(x2-x1)/L
+    element(i,S)= (Nodes(element(i,N2),2)-Nodes(element(i,N1),2))/element(i,L);%(y2-y1)/L
+end 
     %show the current shape of the bow in an animation
     Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end - 2))
 
@@ -113,15 +142,16 @@ while ((failureFlag == 0 )&&( F(end-2) <= 2*F_End))
 %     end
 
     %updates the lengths of each bow element (not string)
-    elementVec = zeros(1,length(xfinal));
-    for i = 2:length(xfinal)
-        elementVec(1,i) = sqrt((xfinal(1,i)-xfinal(1,i-1))^2 +...
-                         (yfinal(1,i)-yfinal(1,i-1))^2);
-    end
+%     elementVec = zeros(1,length(xfinal));
+%     for i = 2:length(xfinal)
+%         elementVec(1,i) = sqrt((xfinal(1,i)-xfinal(1,i-1))^2 +...
+%                          (yfinal(1,i)-yfinal(1,i-1))^2);
+%     end
 
     CoefMaker;
+    [G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,sparseNodes,RunningFlag);
 
-    [G_K,G_C,G_M] = Sparse2(G_K,G_C,G_M,indexcenternode);
+%     [G_K,G_C,G_M] = Sparse2(G_K,G_C,G_M,indexcenternode);
     
     %check failure
     count = count+1;
