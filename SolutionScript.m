@@ -4,11 +4,11 @@ clc;
 
 %for in newtons
 F_Start = 0;
-F_Step = 0.1;
-F_End = 100;
+F_Step = 0.01;
+F_End = 35;
 
 %time step
-dt = 0.00001;
+dt = 0.001;
 
 %number of times through loop
 count = 0;
@@ -49,7 +49,6 @@ KeffMatrices = zeros(6, 6, NN);
 
 
 sparseNodes=[3*NN 3*NN-1 3*NN/2 3*NN/2-1 3*NN/2-2];
-
 %sparce
 [ G_M, G_K, G_C, KeffMatrices ] = CoefMaker( NN, element);
 [G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,sparseNodes,RunningFlag);
@@ -59,18 +58,20 @@ RunningFlag=1;
 % while ((failureFlag == 0 )&&( F(end-2) <= 2*F_End))
 while (failureFlag == 0)
     
-F(end - 2) = F(end - 2) + F_Step;
+    if F(end)<F_End
+        F(end) = F(end) + F_Step;
+    end
 
 %Setup to make everything in the form Ax = B
         A = G_M/dt^2 + G_C/(2*dt); 
         G1 = (G_K - 2*G_M/(dt^2))*U;
         G2 = (G_M/dt^2 - G_C/(2*dt))*Uminus;
 % 
-%         if (F(end-2) < F_End)
+        if (F(end) < F_End)
            B =  -G1 - G2 + F;    %make force vector
-%         else
-%            B =  -G1 - G2;
-%         end
+        else
+           B =  -G1 - G2;
+        end
 
         %Solve for Uplus
 %       Uplus = seidelSolver(G_M,G_K,G_C,Uminus,U,dt,F);
@@ -122,13 +123,13 @@ F(end - 2) = F(end - 2) + F_Step;
 %     stringy(end)=yfinal(end);
 %     stringy(1)=yfinal(1);
 for i = 1:NN
-    element(i,7)=sqrt((Nodes(element(i,2),1)-Nodes(element(i,1),1))^2 + ...
-        (Nodes(element(i,2),2)-Nodes(element(i,1),2))^2);
+        element(i,7)=sqrt((Nodes(element(i,2),1)-Nodes(element(i,1),1))^2 + ...
+            (Nodes(element(i,2),2)-Nodes(element(i,1),2))^2);
     element(i,3)= (Nodes(element(i,2),1)-Nodes(element(i,1),1))/element(i,7);%(x2-x1)/L
     element(i,4)= (Nodes(element(i,2),2)-Nodes(element(i,1),2))/element(i,7);%(y2-y1)/L
 end 
     %show the current shape of the bow in an animation
-    Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end - 2))
+    Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end))
 
 %     for j=2:3
 %         stringangle(j) = atan((stringy(j)-stringy(j-1)) ./ (stringx(j)-stringx(j-1)));
