@@ -9,7 +9,7 @@ function [ G_M ] = CreateMGlobal(G_M,C,S,Node1,Node2,density,A,L)
              0 0 0  C S 0;
              0 0 0 -S C 0;
              0 0 0  0 0 1;];
-        
+         
         %Taken off from formula
         local=[140      0      0  70     0      0;
                  0    156   22*L   0    54  -13*L;
