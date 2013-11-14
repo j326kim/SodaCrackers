@@ -61,9 +61,6 @@ while (failureFlag == 0)
     
 F(end - 2) = F(end - 2) + F_Step;
 
-
-
-
 %Setup to make everything in the form Ax = B
         A = G_M/dt^2 + G_C/(2*dt); 
         G1 = (G_K - 2*G_M/(dt^2))*U;
@@ -77,7 +74,7 @@ F(end - 2) = F(end - 2) + F_Step;
 
         %Solve for Uplus
 %       Uplus = seidelSolver(G_M,G_K,G_C,Uminus,U,dt,F);
-%         Uplus = seidelSolver(A,U,B);
+%       Uplus = seidelSolver(A,U,B);
         Uplus = inv(A)*B;
 %         if Uplus(8)~=Uplus(11)
 %             pause;
@@ -97,20 +94,18 @@ F(end - 2) = F(end - 2) + F_Step;
             x_Animate(i, count+1) =  Nodes(i,1);
             Nodes(i,2) = Nodes(i,2) + U(3*i-1,1)-Uminus(3*i-1,1);
             y_Animate(i, count+1) =  Nodes(i,2);
-        else
-            Nodes(i+1,1) = Nodes(i+1,1) + U(3*i-2,1)-Uminus(3*i-2,1);
-            x_Animate(i+1, count+1) =  Nodes(i+1,1);
-            Nodes(i+1,2) = Nodes(i+1,2) + U(3*i-2,1)-Uminus(3*i-2,1);
-            y_Animate(i+1, count+1) =  Nodes(i+1,2);
-        end
-        
-        if i == NN - 1
+        elseif i == NN - 1
             Nodes(i+1,1) = Nodes(i+1,1) + U(3*i-2,1)-Uminus(3*i-2,1);
             x_Animate(i+1, count+1) =  Nodes(i+1,1);
             Nodes(i+1,2) = 0;
             y_Animate(i+1, count+1) =  0;
+        else
+            Nodes(i+1,1) = Nodes(i+1,1) + U(3*i-2,1)-Uminus(3*i-2,1);
+            x_Animate(i+1, count+1) =  Nodes(i+1,1);
+            Nodes(i+1,2) = Nodes(i+1,2) + U(3*i-1,1)-Uminus(3*i-1,1);
+            y_Animate(i+1, count+1) =  Nodes(i+1,2);
         end
-        
+                
     end
     
 %     %string(2) is the string node which moves in the X direction
@@ -127,10 +122,10 @@ F(end - 2) = F(end - 2) + F_Step;
 %     stringy(end)=yfinal(end);
 %     stringy(1)=yfinal(1);
 for i = 1:NN
-    element(i,7)=sqrt((Nodes(element(i,N2),1)-Nodes(element(i,N1),1))^2 + ...
-        (Nodes(element(i,N2),2)-Nodes(element(i,N1),2))^2);
-    element(i,3)= (Nodes(element(i,N2),1)-Nodes(element(i,N1),1))/element(i,L);%(x2-x1)/L
-    element(i,4)= (Nodes(element(i,N2),2)-Nodes(element(i,N1),2))/element(i,L);%(y2-y1)/L
+    element(i,7)=sqrt((Nodes(element(i,2),1)-Nodes(element(i,1),1))^2 + ...
+        (Nodes(element(i,2),2)-Nodes(element(i,1),2))^2);
+    element(i,3)= (Nodes(element(i,2),1)-Nodes(element(i,1),1))/element(i,7);%(x2-x1)/L
+    element(i,4)= (Nodes(element(i,2),2)-Nodes(element(i,1),2))/element(i,7);%(y2-y1)/L
 end 
     %show the current shape of the bow in an animation
     Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end - 2))
@@ -167,7 +162,7 @@ end
 %     if mod(count,300)==0
 %         pause;
 %     end
-   pause(0.04)
+
 end
 
 % 

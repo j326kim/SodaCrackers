@@ -13,9 +13,9 @@ function G_C = CreateCGlobal(Global,C,S,L,A,Node1,Node2)
     %take local matrix and insert 
     Node1=Node1*3-2;
     Node2=Node2*3-2;
-    Global(Node1:Node1+3-1,Node1:Node1+3-1)= Global(Node1:Node1+3-1,Node1:Node1+3-1) + local;
-    Global(Node2:Node2+3-1,Node2:Node2+3-1)= Global(Node2:Node2+3-1,Node2:Node2+3-1) + local;
-    Global(Node2:Node2+3-1,Node1:Node1+3-1)= Global(Node2:Node2+3-1,Node1:Node1+3-1) - local;
-    Global(Node1:Node1+3-1,Node2:Node2+3-1)= Global(Node1:Node1+3-1,Node2:Node2+3-1) - local;
+    Global(Node1:Node1+2,Node1:Node1+2)= Global(Node1:Node1+2,Node1:Node1+2) + local;
+    Global(Node2:Node2+2,Node2:Node2+2)= Global(Node2:Node2+2,Node2:Node2+2) + local;
+    Global(Node2:Node2+2,Node1:Node1+2)= Global(Node2:Node2+2,Node1:Node1+2) - local;
+    Global(Node1:Node1+2,Node2:Node2+2)= Global(Node1:Node1+2,Node2:Node2+2) - local;
     G_C = Global;
 end

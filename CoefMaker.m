@@ -26,6 +26,10 @@ for i=1:NN
     G_M = CreateMGlobal(G_M,C,S,N1,N2,P,A,L);
     %Create global damping Matrix
     G_C = CreateCGlobal(G_C,C,S,L,A,N1,N2);
+%     if  max(max(G_M-G_M')) ~= 0
+%         i
+%         pause;
+%     end
 end
     
 

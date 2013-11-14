@@ -19,10 +19,10 @@ function [G_K,local] = CreateKGlobal(Global,C,S,E,L,A,I,Node1,Node2)
         %take local matrix and insert 
         Node1=Node1*3-2; 
         Node2=Node2*3-2;
-        Global(Node1:Node1+3-1,Node1:Node1+3-1)= Global(Node1:Node1+3-1,Node1:Node1+3-1)+local(1:3,1:3);
-        Global(Node2:Node2+3-1,Node2:Node2+3-1)= Global(Node2:Node2+3-1,Node2:Node2+3-1)+local(4:6,4:6);
-        Global(Node2:Node2+3-1,Node1:Node1+3-1)= Global(Node2:Node2+3-1,Node1:Node1+3-1)+local(1:3,4:6);
-        Global(Node1:Node1+3-1,Node2:Node2+3-1)= Global(Node1:Node1+3-1,Node2:Node2+3-1)+local(4:6,1:3);
+        Global(Node1:Node1+2,Node1:Node1+2)= Global(Node1:Node1+2,Node1:Node1+2)+local(1:3,1:3);
+        Global(Node2:Node2+2,Node2:Node2+2)= Global(Node2:Node2+2,Node2:Node2+2)+local(4:6,4:6);
+        Global(Node1:Node1+2,Node2:Node2+2)= Global(Node1:Node1+2,Node2:Node2+2)+local(1:3,4:6);
+        Global(Node2:Node2+2,Node1:Node1+2)= Global(Node2:Node2+2,Node1:Node1+2)+local(4:6,1:3);
         G_K=Global;
 end
 
@@ -36,10 +36,10 @@ end
 % 
 %           localchris = T'*local*T;
 %           
-%                   T = [C S 0 0 0 0;
-%             -S C 0 0 0 0;
-%              0 0 1 0 0 0;
-%              0 0 0 C S 0;
+%         T = [C S 0  0 0 0;
+%             -S C 0  0 0 0;
+%              0 0 1  0 0 0;
+%              0 0 0  C S 0;
 %              0 0 0 -S C 0;
-%              0 0 0 0 0 1;];
+%              0 0 0  0 0 1;];
 

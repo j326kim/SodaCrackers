@@ -1,5 +1,5 @@
 
-NN=8; %number of nodes                                                                                                                                                                                                 ; %number of nodes including string
+NN=6; %number of nodes                                                                                                                                                                                                 ; %number of nodes including string
 %columns in elemental matrix
 N1=1;N2=2;C=3;S=4;e=5;CrossA=6;L=7; ro=8;thick=9; I=10;
 element=zeros(NN,10);
