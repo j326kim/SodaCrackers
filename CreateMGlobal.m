@@ -1,6 +1,6 @@
 %function for creating mass damping matrix with the 2 given nodes
 %with their attributes (Uses distributed mass)
-function [ G_M ] = CreateMGlobal(G_M,C,S,Node1,Node2,desnity,A,L)
+function [ G_M ] = CreateMGlobal(G_M,C,S,Node1,Node2,density,A,L)
         
         %Rotation C = cosine(angle), S = sine(angle)
         T = [C S 0  0 0 0;
@@ -19,7 +19,7 @@ function [ G_M ] = CreateMGlobal(G_M,C,S,Node1,Node2,desnity,A,L)
                  0  -13*L -3*L^2   0 -22*L  4*L^2;];
         
         %Combine everything together
-        local=(T'*local*T*desnity*A*L)/420;
+        local=(T'*local*T*density*A*L)/420;
 
         %take local matrix and insert 
         Node1=Node1*3-2; 
