@@ -1,5 +1,4 @@
 %Create global stiffness, damping, mass matrices with dimension:
-%1 by (3*numberOfNodes)
 G_K = zeros(3*NN);
 G_C = zeros(3*NN);
 G_M = zeros(3*NN);
