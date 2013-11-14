@@ -1,7 +1,8 @@
-function [G_K,G_C,G_M,G_U,G_Ud,G_Udd,G_F] = Sparse(G_K,G_C,G_M,G_U,G_Ud,G_Udd,G_F,centre)
+function [G_K,G_C,G_M,G_U,G_Ud,G_Udd,G_F] = Sparse(G_K,G_C,G_M,G_U,G_Ud,G_Udd,G_F,Nodes)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
     
+    for i=1:length(Nodes)
     G_K(:,23) = [];
     G_K(23,:) = [];
     G_C(:,23) = [];

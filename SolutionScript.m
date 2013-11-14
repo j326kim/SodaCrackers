@@ -9,23 +9,17 @@ dt = 0.00001;
 count = 0;
 failureFlag = 0;
 
-
-
-E = xlsread('InputFile', 1, 'B2'); %youngs Modulus of wood
-p = xlsread('InputFile', 1, 'B4'); %Density (wood)
-w = xlsread('InputFile', 1, 'B6'); %Width of wood (Constant)
-stringMass = xlsread('InputFile', 1, 'H4'); % Mass of the string 
-stringE = xlsread('InputFile', 1, 'H2'); %String modulus of elasticity
-stringD = xlsread('InputFile', 1, 'H6'); %String Radius
-maxtension = xlsread('InputFile', 1, 'B8');
-maxcompression = xlsread('InputFile', 1, 'B10');
+E =6894757290; %youngs Modulus of wood
+p = 470; %Density (wood)
+w = 0.04445; %Width of wood (Constant)
+stringMass = 0.0164427; % Mass of the string 
+stringE = 2e11; %String modulus of elasticity
+stringD = 0.0015875; %String Diameter
+maxtension = 1790000;
+maxcompression = 16500000;
 
 
 Initial_Matrix_Maker;
-
-Number_of_nodes = length(xfinal)+1;
-Number_of_elements = Number_of_nodes - 1;
-StringLE = sqrt((stringy(3)-stringy(2))^2 + (stringx(3)-stringx(2))^2);
 
 F = zeros(Number_of_nodes*3,1);
 U=zeros(Number_of_nodes*3,1);
@@ -34,18 +28,12 @@ Uplus=zeros(Number_of_nodes*3,1);
 x_Animate = zeros(Number_of_nodes, 2000);
 y_Animate = zeros(Number_of_nodes, 2000);
 
-
-elementVec = zeros(1,length(xfinal));
-for i = 2:length(xfinal)
-    elementVec(1,i) = sqrt((xfinal(1,i)-xfinal(1,i-1))^2 +...
-                     (yfinal(1,i)-yfinal(1,i-1))^2);
-end
-
 CoefMaker;
 
+sparseNodes=[3*NN/2-2 3*NN/2-1 3*NN/2 3*NN-2 3*NN-1];
 
 %sparce
-[G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,indexcenternode);
+[G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,sparseNodes);
 
 
 
