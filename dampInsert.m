@@ -1,4 +1,4 @@
-function G_C = dampInsert(Global,C,S,L,A,Node1,Node2)
+function G_C = CreateCGlobal(Global,C,S,L,A,Node1,Node2)
     
     Cd = 1.18125 * L * A;
     if Node1 == length(Global)/3 || Node2 == length(Global)/3

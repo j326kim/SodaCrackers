@@ -18,11 +18,11 @@ for i=1:NN
     I  = element(i,10); %Inertia
     
     %Create global stiffness matrix
-    [G_K, KeffMatrices(:,:,i)] = MatInsert(G_K,C,S,E,L,A,I,N1,N2);
+    [G_K, KeffMatrices(:,:,i)] = CreateKGlobal(G_K,C,S,E,L,A,I,N1,N2);
     %Create global distributed mass matrix
-    G_M = DistributedMassMatrixMaker(G_M,C,S,N1,N2,P,A,L);
+    G_M = CreateMGlobal(G_M,C,S,N1,N2,P,A,L);
     %Create global damping Matrix
-    G_C = dampInsert(G_C,C,S,L,A,N1,N2);
+    G_C = CreateCGlobal(G_C,C,S,L,A,N1,N2);
 end
     
 
