@@ -1,4 +1,4 @@
-function [ broken ] = IsBroken( Keff, U, element, NN, maxtension, maxcompression)
+function [ broken ] = IsBroken( Keff, U, element, NN, maxtension, maxcompression,force)
     %string_a(2) %%angle from node 2 to 1
     %length is number of nodes on bow
     %U is global displacement
@@ -59,6 +59,9 @@ function [ broken ] = IsBroken( Keff, U, element, NN, maxtension, maxcompression
         sigmamax(i) = sigma(i) + flocal(3*i-1)*(element(i,9)/2)/element(i,10);
         if sigmamax(i)> maxtension
             broken = 1;
+            force=1/4.44822162825*force;
+            disp(['Tensile Failure in element ',num2str(i),' with a tensile stress of ',num2str(sigmamax(i)),'Pa'])
+            disp(['Loading on string: ',num2str(force),'lbs']);
         end
     end
     
@@ -68,6 +71,9 @@ function [ broken ] = IsBroken( Keff, U, element, NN, maxtension, maxcompression
         sigmamin(i) = sigma(i) - flocal(3*i-1)*(element(i,9)/2)/element(i,10);
         if sigmamin(i) < -maxcompression
             broken = 1;
+            force=1/4.44822162825*force;
+            disp(['Compression Failure in element ',num2str(i),' with a compressive stress of ',num2str(sigmamin(i)),'Pa'])
+            disp(['Loading on string: ',num2str(force),'lbs']);
         end
     end
     

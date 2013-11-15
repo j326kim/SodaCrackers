@@ -132,7 +132,7 @@ while (count < maxTime)
     Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end));
 
     
-    BrokenFlag = IsBroken( Keff, U, element, NN, maxtension, maxcompression);
+    BrokenFlag = IsBroken( Keff, U, element, NN, maxtension, maxcompression,F(end));
     if BrokenFlag == 1
         error('Bow Broken');
     end
