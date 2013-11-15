@@ -44,7 +44,7 @@ function result = seidelSolver(A,U1,B)
             iterationVector = loopVector;
         else
            fprintf('Max Error for iteration %i: %f\n', counter, maximumError);
-           if (abs(maximumError) < 0.001 && mod(counter,length(U1))==0) %change the value here to adjust precision
+           if (abs(maximumError) < 0.01 && mod(counter,length(U1))==0) %change the value here to adjust precision
                 break; %break out of while loop
            else
                %Make current copy, the previous copy vector

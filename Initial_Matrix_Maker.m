@@ -1,16 +1,7 @@
-
-NN=8; %number of nodes                                                                                                                                                                                                 ; %number of nodes including string
 %columns in elemental matrix
 N1=1;N2=2;C=3;S=4;e=5;CrossA=6;L=7; ro=8;thick=9; I=10;
-element=zeros(NN,10);
 
-E =6894757290; %youngs Modulus of wood
-p = 470; %Density (wood)
-w = 0.04445; %Width of wood (Constant)
-stringMass = 0.0164427; % Mass of the string 
-stringE = 2e11; %String modulus of elasticity
-stringR = 0.0015875/2; %String Diameter
-stringP = 7750; %string density
+
 thickIncrem=0.0127/(NN/2-2); %change in thickness when moving along the bow
 tmax=16.75; %adjust this variable to change the curvature of the bow
 
@@ -26,12 +17,13 @@ for i=2:length(t)
     arclength= arclength+sqrt((y(i)-y(i-1))^2 + (x(i)-x(i-1))^2);
 end
 
-Nodes = zeros(NN,2); 
+%set the x and y value of the first node
 Nodes(NN/2,1) = x(1);
 Nodes(NN/2,2) = y(1);
-        
-n=1;
-linelength=0;
+
+%---------------Assign x and y values to Nodes----------------------------%
+n=1; %keep track of the number of nodes
+linelength=0; %track the arc length moving along the curve
 for i = 2:length(t)
   %arclength of the current element
   linelength = linelength + sqrt((y(i)-y(i-1))^2 + (x(i)-x(i-1))^2);
@@ -42,17 +34,18 @@ for i = 2:length(t)
         n = n +1;
         linelength=0;
     end
-
 end
+%-------------------------------------------------------------------------%
 
-%creates the symmetry of the bow
+%-----------------creates the symmetry of the bow-------------------------%
 for i=1:NN/2-1
     Nodes(NN-i,1)=Nodes(i,1);
     Nodes(NN-i,2)=-Nodes(i,2);
 end
 Nodes(end,1)=Nodes(end-1,1); %set inital position of string seperately
+%-------------------------------------------------------------------------%
 
-%fills in the elemental matrix
+%------------------fills in the elemental matrix--------------------------%
 for i=1:NN
     %assign 2 local nodes to each element
     if i==NN
@@ -93,6 +86,7 @@ for i=1:NN
         element(i,I)=pi* (stringR)^4 / 4; 
     end
 end
+%-------------------------------------------------------------------------%
 
 %plots the bow
 f=figure(1);
