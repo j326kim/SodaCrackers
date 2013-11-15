@@ -40,10 +40,10 @@ function result = seidelSolver(A,U1,B)
         end
         counter = counter + 1;
         if (maximumError < 0)
-            fprintf('Max Error for iteration %i: Diverging\n', counter);
+%             fprintf('Max Error for iteration %i: Diverging\n', counter);
             iterationVector = loopVector;
         else
-           fprintf('Max Error for iteration %i: %f\n', counter, maximumError);
+%            fprintf('Max Error for iteration %i: %f\n', counter, maximumError);
            if (abs(maximumError) < 0.01 && mod(counter,length(U1))==0) %change the value here to adjust precision
                 break; %break out of while loop
            else

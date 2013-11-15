@@ -1,7 +1,7 @@
 %function for creating global stiffness matrix with the 2 given nodes
 %with their attributes
 %Rotation C = cosine(angle), S = sine(angle)
-function [G_K] = CreateKGlobal(Global,C,S,E,L,A,I,Node1,Node2)
+function [G_K, local] = CreateKGlobal(Global,C,S,E,L,A,I,Node1,Node2)
 
         %Taken off from formula
         local=[(A*C^2*E)/L+(12*E*I*S^2)/L^3 (A*C*E*S)/L-(12*C*E*I*S)/L^3 ...
@@ -24,6 +24,7 @@ function [G_K] = CreateKGlobal(Global,C,S,E,L,A,I,Node1,Node2)
         Global(Node1:Node1+2,Node2:Node2+2)= Global(Node1:Node1+2,Node2:Node2+2)+local(1:3,4:6);
         Global(Node2:Node2+2,Node1:Node1+2)= Global(Node2:Node2+2,Node1:Node1+2)+local(4:6,1:3);
         G_K=Global;
+
 end
 
 

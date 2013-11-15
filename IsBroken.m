@@ -1,77 +1,75 @@
-function [ broken ] = IsBroken( Keff, U, angles, length, thickness, width, maxtension, maxcompression)
+function [ broken ] = IsBroken( Keff, U, element, NN, maxtension, maxcompression)
     %string_a(2) %%angle from node 2 to 1
     %length is number of nodes on bow
     %U is global displacement
-    flocal = zeros((length-1)*3,1);
-
-    for i = 1:3:(length-1)*3
+    flocal = zeros(((NN-2)/2)*3,1);
+    C = 3;
+    S = 4;
+  broken = 0;
+    %symmetry, only need to analyze half the bow
+    for i = 1:NN/2-1
 %         Keff(:,:,i) = Keff;
 
-        T = [cos(angles((i-1)/3+2)) sin(angles((i-1)/3+2)) 0 0 0 0; ...
-            -sin(angles((i-1)/3+2)) cos(angles((i-1)/3+2)) 0 0 0 0; ...
+        T = [element(i,C) element(i,S) 0 0 0 0; ...
+            -element(i,S) element(i,C) 0 0 0 0; ...
             0 0 1 0 0 0; ...
-            0 0 0 cos(angles((i-1)/3+2)) sin(angles((i-1)/3+2)) 0; ...
-            0 0 0 -sin(angles((i-1)/3+2)) cos(angles((i-1)/3+2)) 0; ...
+            0 0 0 element(i,C) element(i,S) 0; ...
+            0 0 0 -element(i,S) element(i,C) 0; ...
             0 0 0 0 0 1]; 
-        for j =1:6
-           
-            flocal(i:i+5) = T*Keff(:,:,(i-1)/3+1)*U(i:i+5);
-        end
+        
+            if i == NN/2-1
+                U(NN/2*3-2:NN/2*3) = 0;
+            end
+            
+            flocal(3*i-2:3*i+3) = T*Keff(:,:,i)*U(3*i-2:3*i+3);
+
+
     end
     
     
     %stress along axis
-    sigma = zeros(length-1);
+    sigma = zeros(NN/2,1);
     %assume constant per element, avoid unnecessary use of poissons ratio
-    area  = thickness * 0.0508; 
-    for i = 1:(length-1)
-        sigma(i) = flocal(1+3*(i-1)) ./ area(i);
+    for i = 1:(NN/2)
+        sigma(i) = flocal(i*3 - 2) ./ element(i,6);
     end
     
-    %all axial stresses in tension, set positive
-    for i = 1:(length-1)
-        if sigma(i) < 0
-            sigma(i) = - sigma(i);
-        end
-    end   
+%     %all axial stresses in tension, set positive
+%     for i = 1:(NN/2)
+%         if sigma(i) < 0
+%             sigma(i) = - sigma(i);
+%         end
+%     end   
 
     %moments
-    sigma = zeros(length-1);
-    %assume constant per element, avoid unnecessary use of poissons ratio
-    area  = thickness * 0.0508; 
-    for i = 1:(length-1)
-        sigma(i) = flocal(1+3*(i-1)) ./ area(i);
-    end    
+%included in sigmin and sigmax calculations   
     
     %principle stresses
-    Y = zeros(length-1);
-    I = zeros(length-1);
-    Y = thickness ./ 2; %distance from neutral axis
-    I = (1/12).*(thickness.^3).*width;
-    
-    %check m1 = m2-------------------------------------------------
+
     %just to be safe, set all moments positive
-    for i = 1:(length-1)
-        if flocal(3*i) < 0
-            flocal(3*i) = -flocal(3*i);
-        end
-    end       
+%     for i = 1:NN/2
+%         if flocal(3*i) < 0
+%             flocal(3*i) = -flocal(3*i);
+%         end
+%     end       
        
-    sigmamax = zeros(length-1);
+    sigmamax = zeros(NN/2,1);
     
-    for i = 1:(length-1)
-        sigmamax(i) = sigma(i) + flocal(6*i)*Y(i)/I(i);
-        if sigmamax> maxtension
+    for i = 1:NN/2
+        sigmamax(i) = sigma(i) + flocal(3*i-1)*(element(i,9)/2)/element(i,10);
+        if sigmamax(i)> maxtension
             broken = 1;
         end
     end
     
-    sigmamin = zeros(length-1);
+    sigmamin = zeros(NN/2,1);
     
-    for i = 1:(length-1)
-        sigmamin(i) = sigma(i) - flocal(6*i)*Y(i)/I(i);
-        if sigmamin < -maxcompression
+    for i = 1:NN/2
+        sigmamin(i) = sigma(i) - flocal(3*i-1)*(element(i,9)/2)/element(i,10);
+        if sigmamin(i) < -maxcompression
             broken = 1;
         end
     end
+    
+  
     

@@ -7,7 +7,7 @@ NN=8; %number of nodes
 %----------------Force settings (force is in newtons)---------------------%
 F_Start = 0;
 F_Step = 0.01;
-F_End = 50;
+F_End = 200;
 maxTime=8000;
 %time step
 dt = 0.001;
@@ -25,8 +25,8 @@ E =6894757290; %youngs Modulus of wood
 p = 470; %Density (wood)
 w = 0.04445; %Width of wood (Constant)
 %failure parameters for wooden bow
-maxtension = 1790000;
-maxcompression = 16500000;
+maxtension = 81790000;%took out two zeros
+maxcompression = 86500000;%took out two zeros
 %-------------------------------------------------------------------------%
 
 %---------------------------string properties-----------------------------%
@@ -52,12 +52,14 @@ Uminus=zeros(NN*3,1);
 Uplus=zeros(NN*3,1);
 x_Animate = zeros(NN, maxTime);
 y_Animate = zeros(NN, maxTime);
+Keff = zeros(6, 6, NN);
+BrokenFlag = 0;
 %-------------------------------------------------------------------------%
 
 %---------Create first coefficient matricies and sparse them--------------%
 
 sparseNodes=[3*NN 3*NN-1 3*NN/2 3*NN/2-1 3*NN/2-2];
-[ G_M, G_K, G_C] = CoefMaker( NN, element);
+[ G_M, G_K, G_C, Keff] = CoefMaker( NN, element);
 [G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,sparseNodes,RunningFlag);
 RunningFlag=1;
 %-------------------------------------------------------------------------%
@@ -129,8 +131,17 @@ while (count < maxTime)
     %show the current shape of the bow in an animation
     Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end));
 
+    
+    BrokenFlag = IsBroken( Keff, U, element, NN, maxtension, maxcompression);
+    if BrokenFlag == 1
+        error('Bow Broken');
+    end
+    if count == 50 || count == 6000 || count == 7000 || count == 8000
+        k=0;
+    end
+    
     %recalculate the coefficient matricies
-    [ G_M, G_K, G_C] = CoefMaker( NN, element);
+    [ G_M, G_K, G_C, Keff] = CoefMaker( NN, element);
     [G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,sparseNodes,RunningFlag);
 
     count = count+1;
