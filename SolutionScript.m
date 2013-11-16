@@ -37,7 +37,8 @@ RunningFlag=0;
 E =7900000000; %youngs Modulus of wood
 p = 470; %Density (wood)
 w = 0.04445; %Width of wood (Constant)
-%failure parameters for wooden bow
+%failure parameters for wooden bow were found at:
+%http://www.matbase.com/material-categories/composites/polymer-matrix-composites-pmc/wood/class-2-wood-durable/material-properties-of-western-red-cedar-wood.html#properties
 maxtension = 35e6;%took out two zeros
 maxcompression = 50e6;%took out two zeros
 %-------------------------------------------------------------------------%
