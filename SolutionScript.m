@@ -5,16 +5,23 @@ clc;
 NN=16; %number of nodes
 
 %------------------------------Test Type----------------------------------%
+% WARNING!! Oscillation will take a long time to run due to the number of
+% iterations through the loop.
 PullBack=1;
 Oscillation=0;
-TestType=PullBack;
+TestType=Oscillation; 
 %-------------------------------------------------------------------------%
 
 %----------------Force settings (force is in newtons)---------------------%
 F_Start = 0;
 F_Step = 0.01;
-F_End = 200;
-maxTime=8000;
+if TestType == Oscillation
+    F_End = 35;
+    maxTime=40000;
+else
+    F_End = 2000;
+    maxTime=8000;
+end
 %time step
 dt = 0.001;
 %-------------------------------------------------------------------------%
@@ -44,7 +51,6 @@ stringP = 7750; %String density
 
 %------------------Elemental and Node Matrix creation---------------------%
 Nodes = zeros(NN,2); 
-
 element=zeros(NN,10);
 %-------------------------------------------------------------------------%
 
@@ -91,14 +97,14 @@ while (count < maxTime)
     G2 = (G_M/dt^2 - G_C/(2*dt))*Uminus;
 
     %At F_End, the force is removed in order to see the oscillation of
-    %the bow
+    %the bow for Oscillation TestType. Force keeps ramping up for PullBack
+    %TestType
     if (F(end) < F_End || TestType==PullBack)
        B =  -G1 - G2 + F;    
     else
        B =  -G1 - G2;
     end
 
-    %Solve for Uplus
     Uplus = seidelSolver(A,U,B);
     Uminus = U;
     U = Uplus;
@@ -139,15 +145,14 @@ while (count < maxTime)
     end 
     
     %show the current shape of the bow in an animation
-%     Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end));
+     Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end));
 
+    %Calculates the stress within each member to determine if max tension
+    %or compression has been reached
     if TestType==PullBack
         BrokenFlag = IsBroken( Keff, U, element, NN, maxtension, maxcompression,F(end));
         if BrokenFlag == 1
             error('Bow Broken');
-        end
-        if count == 50 || count == 6000 || count == 7000 || count == 8000
-            k =0;
         end
     end
     
