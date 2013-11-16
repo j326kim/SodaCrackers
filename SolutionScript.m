@@ -2,7 +2,13 @@ clear all;
 close all;
 clc;
 
-NN=8; %number of nodes
+NN=16; %number of nodes
+
+%------------------------------Test Type----------------------------------%
+PullBack=1;
+Oscillation=0;
+TestType=PullBack;
+%-------------------------------------------------------------------------%
 
 %----------------Force settings (force is in newtons)---------------------%
 F_Start = 0;
@@ -21,12 +27,12 @@ count = 0;
 RunningFlag=0;
 
 %-------------------------------wood properties---------------------------%
-E =6894757290; %youngs Modulus of wood
+E =7900000000; %youngs Modulus of wood
 p = 470; %Density (wood)
 w = 0.04445; %Width of wood (Constant)
 %failure parameters for wooden bow
-maxtension = 81790000;%took out two zeros
-maxcompression = 86500000;%took out two zeros
+maxtension = 35e6;%took out two zeros
+maxcompression = 50e6;%took out two zeros
 %-------------------------------------------------------------------------%
 
 %---------------------------string properties-----------------------------%
@@ -73,6 +79,10 @@ while (count < maxTime)
     %increment the force until the force reached F_End
     if F(end)<F_End
         F(end) = F(end) + F_Step;
+    else
+        if TestType==PullBack
+            error('Bow did not break');
+        end
     end
 
     %Setup to make everything in the form Ax = B
@@ -82,7 +92,7 @@ while (count < maxTime)
 
     %At F_End, the force is removed in order to see the oscillation of
     %the bow
-    if (F(end) < F_End)
+    if (F(end) < F_End || TestType==PullBack)
        B =  -G1 - G2 + F;    
     else
        B =  -G1 - G2;
@@ -129,24 +139,38 @@ while (count < maxTime)
     end 
     
     %show the current shape of the bow in an animation
-    Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end));
+%     Animation(x_Animate(:,count+1).',y_Animate(:,count+1).',F(end));
 
-    
-    BrokenFlag = IsBroken( Keff, U, element, NN, maxtension, maxcompression,F(end));
-    if BrokenFlag == 1
-        error('Bow Broken');
-    end
-    if count == 50 || count == 6000 || count == 7000 || count == 8000
-        k=0;
+    if TestType==PullBack
+        BrokenFlag = IsBroken( Keff, U, element, NN, maxtension, maxcompression,F(end));
+        if BrokenFlag == 1
+            error('Bow Broken');
+        end
+        if count == 50 || count == 6000 || count == 7000 || count == 8000
+            k =0;
+        end
     end
     
     %recalculate the coefficient matricies
     [ G_M, G_K, G_C, Keff] = CoefMaker( NN, element);
     [G_K,G_C,G_M,Uplus,U,Uminus,F]= Sparse(G_K,G_C,G_M,Uplus,U,Uminus,F,sparseNodes,RunningFlag);
-
     count = count+1;
 end
 
 figure(2);
 plot(x_Animate(NN,:));
-title('String Node Displacement in X direction')
+title('String Node Position in X direction')
+xlabel('time(ms)');
+ylabel('x position relative to center of the bow (m)');
+
+figure(3);
+plot(x_Animate(NN-1,:));
+title('Bottom Bow Node Position in X direction')
+xlabel('time(ms)');
+ylabel('x position relative to center of the bow (m)');
+
+figure(4);
+plot(x_Animate(1,:));
+title('Top Bow Node Position in X direction')
+xlabel('time(ms)');
+ylabel('x position relative to center of the bow (m)');

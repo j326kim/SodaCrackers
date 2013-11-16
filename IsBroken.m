@@ -55,8 +55,9 @@ function [ broken ] = IsBroken( Keff, U, element, NN, maxtension, maxcompression
        
     sigmamax = zeros(NN/2,1);
     
+    %Tension calculations
     for i = 1:NN/2
-        sigmamax(i) = sigma(i) + flocal(3*i-1)*(element(i,9)/2)/element(i,10);
+        sigmamax(i) = sigma(i) + ((flocal(3*i)+flocal(3*i-1)*element(i,7))*(element(i,9)/2))/element(i,10);
         if sigmamax(i)> maxtension
             broken = 1;
             force=1/4.44822162825*force;
@@ -67,8 +68,9 @@ function [ broken ] = IsBroken( Keff, U, element, NN, maxtension, maxcompression
     
     sigmamin = zeros(NN/2,1);
     
+    %compression calculations
     for i = 1:NN/2
-        sigmamin(i) = sigma(i) - flocal(3*i-1)*(element(i,9)/2)/element(i,10);
+        sigmamin(i) = sigma(i) - (flocal(3*i)+flocal(3*i-1)*element(i,7))*(element(i,9)/2)/element(i,10);
         if sigmamin(i) < -maxcompression
             broken = 1;
             force=1/4.44822162825*force;
