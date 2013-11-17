@@ -1,0 +1,9 @@
+Open solutionscript.m in matlab and at the top there is a variable called TestType.
+
+TestType takes in the variable Oscillation or PullBack which determines which test is run.
+
+PullBack will keep on applying a ramp force until the max tension or compression is reached within a member.
+
+Oscillation will pull the bow back to a force specified in the variable F_End (Newtons) and then release the force.
+The oscillation of the bow and the string will be displayed in the animation. The total time of the test for Oscillation
+can be adjusted using the variable maxTime(milliseconds).
